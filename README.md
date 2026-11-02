@@ -91,16 +91,15 @@ Set these environment variables in your hosting provider (for Vercel: Project â†
 | Variable | Needed for |
 | --- | --- |
 | `NEXT_PUBLIC_SITE_URL` | Your public domain, e.g. `https://www.example.com` (`www.example.com` also works), used in canonical links, the sitemap and sharing previews. On Vercel it falls back to the production domain; elsewhere the build warns and uses `http://localhost:3000`. An invalid value stops the build with an explanation. |
-| `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY` | The Web3Forms access key that delivers contact-form inquiries by email (see below). |
+| `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY` | Optional. Replaces the built-in Web3Forms key so inquiries go to another inbox (see below). |
 
 ## Contact form
 
 The inquiry form (on `/contact`, `/business-divisions` and each division page) is sent through [Web3Forms](https://web3forms.com), which emails each inquiry to the inbox its access key belongs to.
 
-1. Go to https://web3forms.com, enter the inbox that should receive inquiries (e.g. `info@cosmoxindustries.com`) and confirm the email they send you. You get an access key.
-2. Put it in `.env.local` for local testing, and in your hosting provider's environment variables for the live site: `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY=your-key`. It is read at build time, so rebuild or redeploy after setting it.
+The access key is set in `lib/send-inquiry.ts`, so the form works on any host with no setup. To send inquiries to a different inbox (for example from a test deployment), create a key at https://web3forms.com for that inbox and set `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY=the-key` in `.env.local` or your hosting provider's environment variables. It is read at build time, so rebuild or redeploy after changing it.
 
-The key is meant to be public; it only lets people send email to that one inbox. The form is checked in the browser (`validateInquiry` in `lib/inquiry.ts`) and sent from the browser (`lib/send-inquiry.ts`), because Web3Forms' free plan refuses submissions sent from a server. Without a key, inquiries are logged to the browser console in development, and in production visitors are asked to email `info@cosmoxindustries.com` instead.
+The key is meant to be public; it only lets people send email to that one inbox. The form is checked in the browser (`validateInquiry` in `lib/inquiry.ts`) and sent from the browser (`lib/send-inquiry.ts`), because Web3Forms' free plan refuses submissions sent from a server. Note that inquiries sent while testing locally are real and arrive in the inbox too.
 
 Each email's subject names the inquiry type, division and sender, and replying answers the sender directly. When a hidden field that people never see was filled in (usually a bot), the subject starts with "[Possible spam]"; the inquiry is still delivered in case a browser's autofill filled the field for a real visitor. Delivery gives up after 15 seconds and asks the visitor to try again or email instead.
 

@@ -5,10 +5,12 @@ const WEB3FORMS_URL = "https://api.web3forms.com/submit";
 const TIMEOUT_MS = 15_000;
 
 /**
- * Web3Forms access key. It is public by design (Web3Forms expects it in the page), so it is a
- * NEXT_PUBLIC_ variable. Create one at https://web3forms.com with the inbox that should get inquiries.
+ * Cosmox's Web3Forms access key. It is public by design (Web3Forms puts it in the page's HTML) and
+ * only lets people send email to the inbox it was created for. NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY
+ * overrides it, e.g. to point a test deployment at another inbox.
  */
-const accessKey = process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY?.trim();
+const COSMOX_WEB3FORMS_KEY = "c497795b-0428-4899-b0fa-fd077b7e952d";
+const accessKey = process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY?.trim() || COSMOX_WEB3FORMS_KEY;
 
 const tryEmail = `email us at ${contact.email}`;
 
@@ -36,14 +38,6 @@ export async function sendInquiry(previous: InquiryState, formData: FormData): P
   // Bots tend to fill every field, including this hidden one. Flag rather than drop, so an
   // inquiry is never lost if a browser's autofill fills it by mistake.
   const suspectedSpam = Boolean(String(formData.get(inquiryTrapField) ?? "").trim());
-
-  if (!accessKey) {
-    if (process.env.NODE_ENV !== "production") {
-      console.info("[contact] NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY is not set; inquiry not sent:", values);
-      return reply("success", "Thank you. (Development: no Web3Forms key is set, so the inquiry was logged to the browser console.)");
-    }
-    return reply("error", `Sorry, online inquiries are not connected yet. Please ${tryEmail}.`, { values });
-  }
 
   const subject = [suspectedSpam && "[Possible spam]", `Website inquiry: ${values.type}`, values.division, `from ${values.name}`]
     .filter(Boolean)
