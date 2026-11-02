@@ -87,7 +87,7 @@ export default function SiteFooter() {
       </div>
 
       <div className="container footer-legal">
-        <p>&copy; {new Date().getFullYear()} Cosmox Industries. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} Cosmox International Pvt. All rights reserved.</p>
         <ul className="footer-legal-links">
           {legalLinks.map((link) => (
             <li key={link.href}>
@@ -95,12 +95,6 @@ export default function SiteFooter() {
             </li>
           ))}
         </ul>
-        <p>
-          Photography courtesy of{" "}
-          <a href="https://unsplash.com" target="_blank" rel="noreferrer">
-            Unsplash
-          </a>
-        </p>
       </div>
     </footer>
   );
